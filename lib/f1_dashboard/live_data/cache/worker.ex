@@ -1,9 +1,9 @@
-defmodule F1Dashboard.Cache.Worker do
+defmodule F1Dashboard.LiveData.Cache.Worker do
   require Logger
 
   use GenServer
 
-  alias F1Dashboard.Cache.{Scheduler, Updater, Storage, WorkerState}
+  alias F1Dashboard.LiveData.Cache.{Scheduler, Updater, Storage, WorkerState}
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)

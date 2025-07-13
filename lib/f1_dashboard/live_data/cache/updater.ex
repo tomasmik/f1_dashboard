@@ -1,18 +1,15 @@
-defmodule F1Dashboard.Cache.Updater do
+defmodule F1Dashboard.LiveData.Cache.Updater do
   require Logger
 
-  alias F1Dashboard.LiveData
-  alias F1Dashboard.Cache.{Storage}
+  alias F1Dashboard.LiveData.Provider
+  alias F1Dashboard.LiveData.Cache.{Storage}
 
   def events() do
     Logger.info("Loading race events data")
 
     with {:ok, session} <- Storage.get_session(),
-         {:ok, drivers} <- Storage.get_drivers(),
-         {:ok, events} <- LiveData.get_session_events(session),
-         {:ok, driver_events} <- LiveData.get_driver_events(drivers, events) do
+         {:ok, events} <- Provider.session_events(session) do
       Storage.store_events(events)
-      Storage.store_driver_events(driver_events)
       {:ok, events}
     end
   end
@@ -30,17 +27,17 @@ defmodule F1Dashboard.Cache.Updater do
   end
 
   defp load_session() do
-    with {:ok, session} <- LiveData.get_session_latest(),
-         {:ok, drivers} <- LiveData.get_drivers_in_session(session) do
+    with {:ok, session} <- Provider.session_latest(),
+         {:ok, drivers} <- Provider.drivers_in_session(session) do
       update_session_cache(drivers, session)
       {:ok, session}
     end
   end
 
   defp refresh_session(current_session) do
-    with {:ok, session} <- LiveData.get_session_latest(),
+    with {:ok, session} <- Provider.session_latest(),
          true <- session.session_key != current_session.session_key,
-         {:ok, drivers} <- LiveData.get_drivers_in_session(session) do
+         {:ok, drivers} <- Provider.drivers_in_session(session) do
       update_session_cache(drivers, session)
       {:ok, session}
     else

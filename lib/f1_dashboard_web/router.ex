@@ -17,7 +17,7 @@ defmodule F1DashboardWeb.Router do
   scope "/", F1DashboardWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", LiveData.Index, :index
   end
 
   # Other scopes may use custom stacks.

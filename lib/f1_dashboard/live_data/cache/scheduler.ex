@@ -1,7 +1,7 @@
-defmodule F1Dashboard.Cache.Scheduler do
+defmodule F1Dashboard.LiveData.Cache.Scheduler do
   require Logger
 
-  alias F1Dashboard.Cache.WorkerState
+  alias F1Dashboard.LiveData.Cache.WorkerState
 
   def schedule_after(_pid, _event, nil), do: :ok
 

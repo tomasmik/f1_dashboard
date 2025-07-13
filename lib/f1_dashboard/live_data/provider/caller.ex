@@ -1,7 +1,8 @@
-defmodule F1Dashboard.LiveData.Caller do
-  alias F1Dashboard.External.Client
+defmodule F1Dashboard.LiveData.Provider.Caller do
   alias F1Dashboard.LiveData
-  alias F1Dashboard.LiveData.Transformer
+  alias F1Dashboard.External.Client
+
+  alias LiveData.Provider.Transformer
 
   @spec session_latest() :: any()
   def session_latest() do

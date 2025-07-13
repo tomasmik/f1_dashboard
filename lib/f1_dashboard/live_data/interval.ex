@@ -14,6 +14,7 @@ defmodule F1Dashboard.LiveData.Interval do
     # +1 LAP if lapped, or null for the race leader.
     field(:gap_to_leader, :string)
     field(:interval, :string)
+    field(:date, :naive_datetime)
 
     field(:driver_number, :integer)
   end
@@ -24,13 +25,13 @@ defmodule F1Dashboard.LiveData.Interval do
     normalized_data = normalize_string_fields(data)
 
     module
-    |> cast(normalized_data, [:gap_to_leader, :interval, :driver_number])
-    |> validate_required([:driver_number])
+    |> cast(normalized_data, [:date, :gap_to_leader, :interval, :driver_number])
+    |> validate_required([:date, :driver_number])
   end
 
   def changeset(_, %__MODULE__{} = data) do
     change(data)
-    |> validate_required([:driver_number])
+    |> validate_required([:date, :driver_number])
   end
 
   defp normalize_string_fields(data) do

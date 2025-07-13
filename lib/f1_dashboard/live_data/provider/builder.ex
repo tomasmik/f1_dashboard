@@ -1,6 +1,9 @@
-defmodule F1Dashboard.LiveData.BuilderSessionEvents do
-  alias F1Dashboard.LiveData.Caller
-  alias F1Dashboard.LiveData.Session
+defmodule F1Dashboard.LiveData.Provider.SessionEvents do
+  alias F1Dashboard.LiveData
+  alias F1Dashboard.LiveData.Provider
+
+  alias Provider.Caller
+  alias LiveData.Session
 
   @timeout :timer.seconds(10)
   @required_keys ~w(intervals position stints race_control pit)a

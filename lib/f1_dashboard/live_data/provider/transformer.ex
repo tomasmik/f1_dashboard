@@ -1,4 +1,4 @@
-defmodule F1Dashboard.LiveData.Transformer do
+defmodule F1Dashboard.LiveData.Provider.Transformer do
   def filter_for_last_driver({:ok, data}), do: {:ok, do_filter_for_last_driver(data)}
   def filter_for_last_driver(error), do: error
 

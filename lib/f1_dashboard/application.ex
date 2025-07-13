@@ -9,8 +9,8 @@ defmodule F1Dashboard.Application do
       {DNSCluster, query: Application.get_env(:f1_dashboard, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: F1Dashboard.PubSub},
       F1DashboardWeb.Endpoint,
-      F1Dashboard.Cache.Storage,
-      F1Dashboard.Cache.Worker
+      F1Dashboard.LiveData.Cache.Storage,
+      F1Dashboard.LiveData.Cache.Worker
     ]
 
     opts = [strategy: :one_for_one, name: F1Dashboard.Supervisor]

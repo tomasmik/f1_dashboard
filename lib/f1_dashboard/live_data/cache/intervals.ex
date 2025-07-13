@@ -1,4 +1,4 @@
-defmodule F1Dashboard.Cache.WorkerState do
+defmodule F1Dashboard.LiveData.Cache.WorkerState do
   defstruct session_ready: false, session_every: 1, events_every: 1
 
   @no_session_every 2
