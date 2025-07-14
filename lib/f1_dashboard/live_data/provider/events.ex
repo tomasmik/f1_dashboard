@@ -1,4 +1,4 @@
-defmodule F1Dashboard.LiveData.Provider.SessionEvents do
+defmodule F1Dashboard.LiveData.Provider.Events do
   alias F1Dashboard.LiveData
   alias F1Dashboard.LiveData.Provider
 
@@ -16,8 +16,8 @@ defmodule F1Dashboard.LiveData.Provider.SessionEvents do
     pit: &Caller.pit/1
   }
 
-  @spec get_and_build_all(Session.t()) :: {:ok, map()} | {:error, any()}
-  def get_and_build_all(%Session{} = session) do
+  @spec for_session(Session.t()) :: {:ok, map()} | {:error, any()}
+  def for_session(%Session{} = session) do
     @required_keys
     |> Task.async_stream(&fetch_by_key(&1, session), timeout: @timeout)
     |> Enum.into(%{}, fn

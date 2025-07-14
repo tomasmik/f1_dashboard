@@ -22,7 +22,7 @@ defmodule F1Dashboard.LiveData do
   @spec get_events :: SessionEvents.t() | []
   def get_events() do
     Storage.get_events()
-    |> Storage.result_or_default([])
+    |> Storage.result_or_default(%SessionEvents{})
   end
 
   @spec get_drivers() :: [Driver.t(), ...] | []

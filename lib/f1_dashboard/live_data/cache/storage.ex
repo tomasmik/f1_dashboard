@@ -3,15 +3,13 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
 
   use GenServer
 
-  alias F1Dashboard.LiveData.{Session, SessionEvents, Driver}
+  alias F1Dashboard.LiveData.{SessionData, SessionEvents}
 
   alias F1Dashboard.LiveData.Cache.ETS
 
   @type cache_result(t) :: {:ok, t} | {:error, :not_found}
-  @type drivers :: [Driver.t(), ...]
-  @type driver :: Driver.t()
   @type events :: SessionEvents.t()
-  @type session :: Session.t()
+  @type session_data :: SessionData.t()
 
   def result_ok({:error, :not_found}), do: {:ok, nil}
   def result_ok({:ok, value}), do: {:ok, value}
@@ -25,21 +23,15 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
 
   defdelegate get_session, to: ETS
   defdelegate get_events, to: ETS
-  defdelegate get_drivers, to: ETS
 
-  @spec store_session(session()) :: :ok
-  def store_session(%Session{} = session) do
-    GenServer.call(__MODULE__, {:put_session, session})
+  @spec store_events(function()) :: {:ok, atom()} | {:error, any()}
+  def store_events(fun) do
+    GenServer.call(__MODULE__, {:put_events, fun})
   end
 
-  @spec store_events(events()) :: :ok
-  def store_events(%SessionEvents{} = events) do
-    GenServer.call(__MODULE__, {:put_events, events})
-  end
-
-  @spec store_drivers(drivers()) :: :ok
-  def store_drivers(drivers) when is_list(drivers) do
-    GenServer.call(__MODULE__, {:put_drivers, drivers})
+  @spec store_session(session_data()) :: {:ok, atom()} | {:error, any()}
+  def store_session(data) do
+    GenServer.call(__MODULE__, {:put_session_data, data})
   end
 
   def clear_table() do
@@ -57,21 +49,13 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
   end
 
   @impl true
-  def handle_call({:put_session, session}, _from, state) do
-    ETS.store_session(session)
-    {:reply, :ok, state}
+  def handle_call({:put_session_data, data}, _from, state) do
+    {:reply, ETS.store_session(data), state}
   end
 
   @impl true
-  def handle_call({:put_events, events}, _from, state) do
-    ETS.store_all_events(events)
-    {:reply, :ok, state}
-  end
-
-  @impl true
-  def handle_call({:put_drivers, drivers}, _from, state) do
-    ETS.store_drivers(drivers)
-    {:reply, :ok, state}
+  def handle_call({:put_events, fun}, _from, state) do
+    {:reply, ETS.store_all_events(fun), state}
   end
 
   @impl true

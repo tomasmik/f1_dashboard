@@ -21,8 +21,8 @@ defmodule F1Dashboard.LiveData.Driver do
     field(:driver_number, :integer)
   end
 
-  def changeset(data) do
-    %__MODULE__{}
+  def changeset(%__MODULE__{} = driver, data \\ %{}) do
+    driver
     |> cast(data, [
       :broadcast_name,
       :headshot_url,

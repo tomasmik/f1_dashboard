@@ -3,7 +3,9 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   use GenServer
 
-  alias F1Dashboard.LiveData.Cache.{Scheduler, Updater, Storage, WorkerState}
+  alias F1Dashboard.LiveData.Cache.{Scheduler, Storage, WorkerState}
+
+  alias F1Dashboard.LiveData.Provider
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -46,20 +48,22 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
   end
 
   defp load_state() do
-    with {:ok, _} <- Updater.session(),
-         {:ok, _} <- Updater.events() do
+    with {:ok, session_data} <- Provider.session_data(),
+         {:ok, _} <- Storage.store_session(session_data.session),
+         {:ok, _} <- store_events() do
+      Logger.info("Loaded initial state")
       WorkerState.default()
     else
       {:error, reason} ->
-        Logger.error("Got an error while loading initial state #{inspect(reason)}")
+        Logger.error("Got an error while loading state #{inspect(reason)}")
         WorkerState.init()
     end
   end
 
   defp update_session(state) do
-    with {:ok, old} <- Storage.result_ok(Storage.get_session()),
-         {:ok, new} <- Updater.session() do
-      WorkerState.update_session_change(state, old, new)
+    with {:ok, session_data} <- Provider.session_data(),
+         {:ok, status} <- Storage.store_session(session_data.session) do
+      WorkerState.update_session_change(state, status)
     else
       {:error, reason} ->
         Logger.error("Got an error while updating session #{inspect(reason)}, resetting state")
@@ -68,13 +72,23 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
   end
 
   defp update_events(state) do
-    with {:ok, old} <- Storage.result_ok(Storage.get_events()),
-         {:ok, new} <- Updater.events() do
-      WorkerState.update_events_change(state, old, new)
+    with {:ok, status} <- store_events() do
+      WorkerState.update_events_change(state, status)
     else
       {:error, reason} ->
         Logger.error("Got an error while updating events #{inspect(reason)}")
         state
     end
+  end
+
+  defp store_events() do
+    Logger.info("Loading race events data")
+
+    Storage.store_events(fn session ->
+      case Provider.session_events(session) do
+        {:ok, status} -> {:ok, status}
+        error -> error
+      end
+    end)
   end
 end

@@ -35,3 +35,4 @@ f1_dashboard-*.tar
 npm-debug.log
 /assets/node_modules/
 
+reviews/

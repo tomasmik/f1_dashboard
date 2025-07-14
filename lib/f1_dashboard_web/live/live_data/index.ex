@@ -477,7 +477,6 @@ defmodule F1DashboardWeb.LiveData.Index do
 
   defp sorted_race_control(events) do
     events.race_control
-    |> Enum.sort_by(& &1.date, :desc)
   end
 
   defp group_drivers(drivers) do
@@ -498,22 +497,11 @@ defmodule F1DashboardWeb.LiveData.Index do
 
     %{
       driver_number: driver_number,
-      interval: find_latest_interval(events.interval, driver_number),
+      interval: find_latest(events.interval, driver_number),
       pit: find_latest(events.pit, driver_number),
       position: find_latest(events.position, driver_number),
       stint: find_latest(events.stints, driver_number)
     }
-  end
-
-  defp find_latest_interval(events, driver_number) do
-    newest = Enum.max_by(events, & &1.date, NaiveDateTime)
-
-    events
-    |> Enum.filter(fn event ->
-      event.driver_number == driver_number and
-        NaiveDateTime.diff(newest.date, event.date, :second) < @oldest_event_acceptable_diff
-    end)
-    |> List.last()
   end
 
   defp find_latest(events, driver_number) do

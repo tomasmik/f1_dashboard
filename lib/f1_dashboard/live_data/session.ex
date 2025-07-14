@@ -27,8 +27,8 @@ defmodule F1Dashboard.LiveData.Session do
     field(:meeting_key, :integer)
   end
 
-  def changeset(data) do
-    %__MODULE__{}
+  def changeset(%__MODULE__{} = session, data \\ %{}) do
+    session
     |> cast(data, [
       :circuit_short_name,
       :country_name,

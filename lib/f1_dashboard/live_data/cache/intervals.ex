@@ -24,32 +24,13 @@ defmodule F1Dashboard.LiveData.Cache.WorkerState do
     }
   end
 
-  def update_session_change(%__MODULE__{} = state, old, new) do
-    session_changed(state, !two_events_equal?(old, new))
-  end
+  def update_session_change(_, :updated), do: default()
+  def update_session_change(%__MODULE__{} = state, _), do: state
 
-  def update_events_change(%__MODULE__{} = state, old, new) do
-    events_changed(state, !two_events_equal?(old, new))
-  end
+  def update_events_change(_, :updated), do: default()
 
-  defp two_events_equal?(old_events, new_events) do
-    calculate_checksum(old_events) == calculate_checksum(new_events)
-  end
-
-  defp calculate_checksum(events) do
-    events
-    |> :erlang.term_to_binary()
-    |> :erlang.md5()
-    |> Base.encode16()
-  end
-
-  defp events_changed(_state, true), do: default()
-
-  defp events_changed(state, false) do
+  def update_events_change(%__MODULE__{} = state, _) do
     got = min(@maximum_race_every, state.events_every * 2)
     %{state | events_every: got}
   end
-
-  defp session_changed(_state, true), do: default()
-  defp session_changed(state, false), do: state
 end
