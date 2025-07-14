@@ -1,9 +1,13 @@
 defmodule F1Dashboard.LiveData do
   @moduledoc """
-  Public API for accessing cached F1 live data.
+  Public API for accessing and manipulating cached F1 live data.
   """
 
   require Logger
+
+  alias Phoenix.PubSub
+
+  alias F1Dashboard.Topics
   alias F1Dashboard.LiveData.Cache.Storage
   alias F1Dashboard.LiveData.{Session, SessionEvents, Driver}
 
@@ -11,37 +15,25 @@ defmodule F1Dashboard.LiveData do
 
   @spec get_session :: Session.t() | nil
   def get_session() do
-    case Storage.get_session() do
-      {:ok, session} ->
-        session
-
-      error ->
-        Logger.warning("Failed to load session in the context: #{inspect(error)}")
-        nil
-    end
+    Storage.get_session()
+    |> Storage.result_or_default(nil)
   end
 
   @spec get_events :: SessionEvents.t() | []
   def get_events() do
-    case Storage.get_events() do
-      {:ok, events} ->
-        events
-
-      error ->
-        Logger.warning("Failed to load events in the context: #{inspect(error)}")
-        nil
-    end
+    Storage.get_events()
+    |> Storage.result_or_default([])
   end
 
   @spec get_drivers() :: [Driver.t(), ...] | []
   def get_drivers() do
-    case Storage.get_drivers() do
-      {:ok, drivers} ->
-        drivers
+    Storage.get_drivers()
+    |> Storage.result_or_default([])
+  end
 
-      error ->
-        Logger.warning("Failed to load drivers in the context: #{inspect(error)}")
-        nil
-    end
+  def subscribe() do
+    PubSub.subscribe(F1Dashboard.PubSub, Topics.session())
+    PubSub.subscribe(F1Dashboard.PubSub, Topics.drivers())
+    PubSub.subscribe(F1Dashboard.PubSub, Topics.events())
   end
 end

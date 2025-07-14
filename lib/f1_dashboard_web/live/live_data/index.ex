@@ -6,7 +6,11 @@ defmodule F1DashboardWeb.LiveData.Index do
   @oldest_event_acceptable_diff 300
 
   def mount(_conn, _session, socket) do
-    if connected?(socket), do: Process.send_after(self(), :load_data, 0)
+    if connected?(socket) do
+      Process.send_after(self(), :load_data, 0)
+      LiveData.subscribe()
+    end
+
     {:ok, assign(socket, :loading, true)}
   end
 
@@ -27,6 +31,33 @@ defmodule F1DashboardWeb.LiveData.Index do
       |> assign(loading: session == nil)
 
     {:noreply, socket}
+  end
+
+  def handle_info({:events_updated, events}, socket) do
+    drivers = LiveData.get_drivers()
+    grouped_events = group_events_by_drivers(drivers, events)
+
+    new_socket =
+      socket
+      |> assign(driver_events: grouped_events)
+      |> assign(race_control: sorted_race_control(events))
+      |> assign(weather: seed_weather_data())
+
+    {:noreply, new_socket}
+  end
+
+  def handle_info({:session_updated, session}, socket) do
+    new_socket =
+      socket
+      |> assign(session: session)
+      |> assign(loading: session == nil)
+
+    {:noreply, new_socket}
+  end
+
+  def handle_info({:drivers_updated, drivers}, socket) do
+    grouped = group_drivers(drivers)
+    {:noreply, assign(socket, :drivers, grouped)}
   end
 
   def render(assigns) do

@@ -3,6 +3,8 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
 
   @table_name :f1_data
 
+  alias Phoenix.PubSub
+  alias F1Dashboard.Topics
   alias F1Dashboard.LiveData.{Session, SessionEvents, Driver}
 
   @type cache_result(t) :: {:ok, t} | {:error, :not_found}
@@ -63,16 +65,19 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end)
 
     Logger.info("Update to drivers data in the cache")
+    PubSub.broadcast(F1Dashboard.PubSub, Topics.session(), {:drivers_updated, drivers})
   end
 
   def store_session(session) do
     :ets.insert(@table_name, {:session, session})
     Logger.info("Update to session data in the cache")
+    PubSub.broadcast(F1Dashboard.PubSub, Topics.session(), {:session_updated, session})
   end
 
   def store_all_events(events) do
     :ets.insert(@table_name, {:events, events})
     Logger.info("Update to events data in the cache")
+    PubSub.broadcast(F1Dashboard.PubSub, Topics.events(), {:events_updated, events})
   end
 
   def clear_table() do
