@@ -46,7 +46,15 @@ defmodule F1Dashboard.LiveData.Provider.Transformer do
 
   defp do_sort_by_date(data) do
     data
-    |> Enum.sort_by(&must_parse_date(&1), :desc)
+    |> Enum.sort_by(
+      fn item ->
+        {
+          must_parse_date(item),
+          item["message"]
+        }
+      end,
+      :desc
+    )
   end
 
   defp do_sort_by_position(data) do

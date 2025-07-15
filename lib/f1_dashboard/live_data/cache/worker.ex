@@ -49,7 +49,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   defp load_state() do
     with {:ok, session_data} <- Provider.session_data(),
-         {:ok, _} <- Storage.store_session(session_data.session),
+         {:ok, _} <- Storage.store_session(session_data),
          {:ok, _} <- store_events() do
       Logger.info("Loaded initial state")
       WorkerState.default()
@@ -62,7 +62,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   defp update_session(state) do
     with {:ok, session_data} <- Provider.session_data(),
-         {:ok, status} <- Storage.store_session(session_data.session) do
+         {:ok, status} <- Storage.store_session(session_data) do
       WorkerState.update_session_change(state, status)
     else
       {:error, reason} ->
@@ -84,8 +84,8 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
   defp store_events() do
     Logger.info("Loading race events data")
 
-    Storage.store_events(fn session ->
-      case Provider.session_events(session) do
+    Storage.store_events(fn session_data ->
+      case Provider.session_events(session_data.session) do
         {:ok, status} -> {:ok, status}
         error -> error
       end

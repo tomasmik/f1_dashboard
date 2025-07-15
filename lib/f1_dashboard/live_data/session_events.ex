@@ -5,32 +5,26 @@ defmodule F1Dashboard.LiveData.SessionEvents do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias F1Dashboard.LiveData.{Interval, Pit, Position, Stint, RaceControl}
+  alias F1Dashboard.LiveData.{DriverEvent, RaceControl, Weather}
 
   @type t :: %__MODULE__{
-          interval: [Interval.t()],
-          pit: [Pit.t()],
-          position: [Position.t()],
-          race_control: [RaceControl.t()],
-          stints: [Stint.t()]
+          driver_events: [DriverEvent.t(), ...],
+          race_control: [RaceControl.t(), ...] | nil,
+          weather: Weather.t() | nil
         }
 
   @primary_key false
   embedded_schema do
-    embeds_many(:interval, Interval)
-    embeds_many(:pit, Pit)
-    embeds_many(:position, Position)
-    embeds_many(:stints, Stint)
+    embeds_many(:driver_events, DriverEvent)
     embeds_many(:race_control, RaceControl)
+    embeds_one(:weather, Weather)
   end
 
   def changeset(data) do
     %__MODULE__{}
     |> cast(data, [])
-    |> cast_embed(:interval, required: true, with: &Interval.changeset/2)
-    |> cast_embed(:pit, required: true, with: &Pit.changeset/2)
-    |> cast_embed(:position, required: true, with: &Position.changeset/2)
-    |> cast_embed(:stints, required: true, with: &Stint.changeset/2)
-    |> cast_embed(:race_control, required: true, with: &RaceControl.changeset/2)
+    |> cast_embed(:driver_events, required: true, with: &DriverEvent.changeset/2)
+    |> cast_embed(:race_control, required: false, with: &RaceControl.changeset/2)
+    |> cast_embed(:weather, required: false, with: &Weather.changeset/2)
   end
 end

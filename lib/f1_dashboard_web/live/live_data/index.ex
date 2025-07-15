@@ -3,7 +3,7 @@ defmodule F1DashboardWeb.LiveData.Index do
 
   alias F1Dashboard.{LiveData}
 
-  @oldest_event_acceptable_diff 300
+  alias LiveData.{SessionEvents, SessionData}
 
   def mount(_conn, _session, socket) do
     if connected?(socket) do
@@ -15,49 +15,17 @@ defmodule F1DashboardWeb.LiveData.Index do
   end
 
   def handle_info(:load_data, socket) do
-    session = LiveData.get_session()
-    drivers = LiveData.get_drivers()
+    session_data = LiveData.get_session()
     events = LiveData.get_events()
-    grouped_events = group_events_by_drivers(drivers, events)
-    grouped_drivers = group_drivers(drivers)
-
-    socket =
-      socket
-      |> assign(session: session)
-      |> assign(weather: seed_weather_data())
-      |> assign(race_control: sorted_race_control(events))
-      |> assign(driver_events: grouped_events)
-      |> assign(drivers: grouped_drivers)
-      |> assign(loading: session == nil)
-
-    {:noreply, socket}
+    {:noreply, socket_assign_init(socket, session_data, events)}
   end
 
   def handle_info({:events_updated, events}, socket) do
-    drivers = LiveData.get_drivers()
-    grouped_events = group_events_by_drivers(drivers, events)
-
-    new_socket =
-      socket
-      |> assign(driver_events: grouped_events)
-      |> assign(race_control: sorted_race_control(events))
-      |> assign(weather: seed_weather_data())
-
-    {:noreply, new_socket}
+    {:noreply, socket_assign_events(socket, events)}
   end
 
   def handle_info({:session_updated, session}, socket) do
-    new_socket =
-      socket
-      |> assign(session: session)
-      |> assign(loading: session == nil)
-
-    {:noreply, new_socket}
-  end
-
-  def handle_info({:drivers_updated, drivers}, socket) do
-    grouped = group_drivers(drivers)
-    {:noreply, assign(socket, :drivers, grouped)}
+    {:noreply, socket_assign_session(socket, session)}
   end
 
   def render(assigns) do
@@ -475,49 +443,33 @@ defmodule F1DashboardWeb.LiveData.Index do
     Calendar.strftime(datetime, "%b %d, %Y at %I:%M %p")
   end
 
-  defp sorted_race_control(events) do
-    events.race_control
+  defp socket_assign_init(socket, nil, _) do
+    socket
+    |> assign(loading: true)
+    |> assign(session: nil)
+    |> assign(weather: nil)
+    |> assign(race_control: nil)
+    |> assign(driver_events: nil)
+    |> assign(drivers: nil)
   end
 
-  defp group_drivers(drivers) do
-    drivers
-    |> Enum.reduce(%{}, fn driver, acc ->
-      Map.put(acc, driver.driver_number, driver)
-    end)
+  defp socket_assign_init(socket, session_data, events) do
+    socket
+    |> socket_assign_session(session_data)
+    |> socket_assign_events(events)
   end
 
-  defp group_events_by_drivers(drivers, events) do
-    drivers
-    |> Enum.map(&group_events_by_driver(&1, events))
-    |> Enum.sort_by(& &1.position.position, :asc)
+  defp socket_assign_events(socket, %SessionEvents{} = events) do
+    socket
+    |> assign(weather: events.weather)
+    |> assign(race_control: events.race_control)
+    |> assign(driver_events: events.driver_events)
   end
 
-  defp group_events_by_driver(driver, events) do
-    driver_number = driver.driver_number
-
-    %{
-      driver_number: driver_number,
-      interval: find_latest(events.interval, driver_number),
-      pit: find_latest(events.pit, driver_number),
-      position: find_latest(events.position, driver_number),
-      stint: find_latest(events.stints, driver_number)
-    }
-  end
-
-  defp find_latest(events, driver_number) do
-    events
-    |> Enum.filter(&(&1.driver_number == driver_number))
-    |> List.last()
-  end
-
-  defp seed_weather_data() do
-    %{
-      air_temperature: 10,
-      track_temperature: 10,
-      humidity: 99,
-      wind_speed: 4,
-      wind_direction: "57",
-      rainfall: 0
-    }
+  defp socket_assign_session(socket, %SessionData{} = session_data) do
+    socket
+    |> assign(loading: false)
+    |> assign(session: session_data.session)
+    |> assign(drivers: SessionData.drivers_by_number(session_data))
   end
 end

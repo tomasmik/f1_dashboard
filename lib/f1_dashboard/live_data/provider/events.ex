@@ -63,12 +63,54 @@ defmodule F1Dashboard.LiveData.Provider.Events do
          race_control: race_control,
          pit: pit
        }) do
-    %{
+    events = %{
       interval: intervals,
       position: position,
       stints: stints,
       race_control: race_control,
       pit: pit
+    }
+
+    %{
+      driver_events: get_drivers_and_group(events),
+      race_control: race_control,
+      weather: seed_weather_data()
+    }
+  end
+
+  defp get_drivers_and_group(%{position: position} = events) do
+    get_all_driver_numbers(position)
+    |> Enum.map(&group_events_by_driver(&1, events))
+  end
+
+  defp group_events_by_driver(driver_number, events) do
+    %{
+      driver_number: driver_number,
+      interval: find_latest(events.interval, driver_number),
+      pit: find_latest(events.pit, driver_number),
+      position: find_latest(events.position, driver_number),
+      stint: find_latest(events.stints, driver_number)
+    }
+  end
+
+  defp get_all_driver_numbers(events) do
+    events |> Enum.map(& &1["driver_number"])
+  end
+
+  defp find_latest(events, driver_number) do
+    events
+    |> Enum.filter(&(&1["driver_number"] == driver_number))
+    |> List.last()
+  end
+
+  defp seed_weather_data() do
+    %{
+      air_temperature: 325,
+      track_temperature: 37.1,
+      humidity: 99,
+      wind_speed: 2.4,
+      wind_direction: 57,
+      rainfall: 0
     }
   end
 end

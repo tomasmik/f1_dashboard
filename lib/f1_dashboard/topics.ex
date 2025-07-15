@@ -8,7 +8,4 @@ defmodule F1Dashboard.Topics do
 
   @spec session :: String.t()
   def session, do: "session:all"
-
-  @spec drivers :: String.t()
-  def drivers, do: "drivers:all"
 end

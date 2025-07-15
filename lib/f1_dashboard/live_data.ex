@@ -9,31 +9,31 @@ defmodule F1Dashboard.LiveData do
 
   alias F1Dashboard.Topics
   alias F1Dashboard.LiveData.Cache.Storage
-  alias F1Dashboard.LiveData.{Session, SessionEvents, Driver}
+  alias F1Dashboard.LiveData.{SessionData, SessionEvents}
 
   @type storage_result(t) :: {:ok, t} | {:error, :not_found}
 
-  @spec get_session :: Session.t() | nil
+  @spec get_session :: SessionData.t() | nil
   def get_session() do
     Storage.get_session()
-    |> Storage.result_or_default(nil)
+    |> result_or_default(nil)
   end
 
-  @spec get_events :: SessionEvents.t() | []
+  @spec get_events :: SessionEvents.t()
   def get_events() do
     Storage.get_events()
-    |> Storage.result_or_default(%SessionEvents{})
-  end
-
-  @spec get_drivers() :: [Driver.t(), ...] | []
-  def get_drivers() do
-    Storage.get_drivers()
-    |> Storage.result_or_default([])
+    |> result_or_default(%SessionEvents{})
   end
 
   def subscribe() do
     PubSub.subscribe(F1Dashboard.PubSub, Topics.session())
-    PubSub.subscribe(F1Dashboard.PubSub, Topics.drivers())
     PubSub.subscribe(F1Dashboard.PubSub, Topics.events())
   end
+
+  defp result_or_default({:error, any}, default) do
+    Logger.warning("Failed to load data: #{inspect(any)}")
+    default
+  end
+
+  defp result_or_default({:ok, value}, _), do: value
 end

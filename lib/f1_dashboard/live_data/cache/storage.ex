@@ -11,16 +11,6 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
   @type events :: SessionEvents.t()
   @type session_data :: SessionData.t()
 
-  def result_ok({:error, :not_found}), do: {:ok, nil}
-  def result_ok({:ok, value}), do: {:ok, value}
-
-  def result_or_default({:error, any}, default) do
-    Logger.warning("Failed to load data: #{inspect(any)}")
-    default
-  end
-
-  def result_or_default(value, _), do: value
-
   defdelegate get_session, to: ETS
   defdelegate get_events, to: ETS
 
