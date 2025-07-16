@@ -15,7 +15,7 @@ defmodule F1Dashboard.LiveData.Weather do
   embedded_schema do
     field(:air_temperature, :float)
     field(:track_temperature, :float)
-    field(:humidity, :integer)
+    field(:humidity, :float)
     field(:rainfall, :integer)
     field(:wind_speed, :float)
     field(:wind_direction, :integer)

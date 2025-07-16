@@ -26,6 +26,13 @@ defmodule F1Dashboard.LiveData.Provider.Caller do
     |> Transformer.sort_by_date()
   end
 
+  @spec weather(Session.t()) :: {:ok, map()} | {:error, any()}
+  def weather(%Session{} = session) do
+    make_opts(session)
+    |> Client.weather()
+    |> Transformer.get_last()
+  end
+
   @spec intervals(Session.t()) :: {:ok, list()} | {:error, any()}
   def intervals(%Session{} = session) do
     make_opts(session)

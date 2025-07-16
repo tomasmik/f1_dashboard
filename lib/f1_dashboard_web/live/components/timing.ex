@@ -1,6 +1,9 @@
 defmodule F1DashboardWeb.Components.Timing do
   use Phoenix.Component
 
+  attr :driver_events, :list, required: true
+  attr :drivers, :map, required: true
+
   def render(assigns) do
     ~H"""
     <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">

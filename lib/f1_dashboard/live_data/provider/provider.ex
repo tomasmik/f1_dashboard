@@ -11,23 +11,17 @@ defmodule F1Dashboard.LiveData.Provider do
 
   @spec session_data() :: data_result(SessionData.t())
   def session_data() do
-    case Provider.Session.latest() do
-      {:ok, data} ->
-        normalize(data, SessionData)
-
-      {:error, error} ->
-        {:error, error}
+    with {:ok, session} <- Provider.Session.latest(),
+         {:ok, struct} <- normalize(session, SessionData) do
+      {:ok, struct}
     end
   end
 
   @spec session_events(Session.t()) :: data_result(SessionEvents.t())
   def session_events(%Session{} = session) do
-    case Provider.Events.for_session(session) do
-      {:ok, data} ->
-        normalize(data, SessionEvents)
-
-      {:error, error} ->
-        {:error, error}
+    with {:ok, events} <- Provider.Events.for_session(session),
+         {:ok, struct} <- normalize(events, SessionEvents) do
+      {:ok, struct}
     end
   end
 end

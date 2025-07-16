@@ -1,5 +1,13 @@
 defmodule F1Dashboard.External.Openf1 do
-  require Logger
+  @moduledoc """
+  Openf1 is an API which can be used to gather live and
+  historical F1 Data. This module queries that API and returns
+  the results.
+
+  Official documentation can be found at: https://openf1.org/
+  No Live data is provided when using the public API.
+  You have to host their project yourself to receive the data.
+  """
 
   def drivers(opts \\ []) do
     make_request("drivers", opts)
@@ -29,6 +37,10 @@ defmodule F1Dashboard.External.Openf1 do
     make_request("stints", opts)
   end
 
+  def weather(opts \\ []) do
+    make_request("weather", opts)
+  end
+
   defp make_request(path, params) do
     headers = [Accept: "Application/json; Charset=utf-8"]
 
@@ -46,7 +58,7 @@ defmodule F1Dashboard.External.Openf1 do
   defp do_request_and_decode(url, headers, options) do
     case HTTPoison.get(url, headers, options) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        Jason.decode(body)
+        {:ok, Jason.decode!(body)}
 
       {:ok, %HTTPoison.Response{status_code: _status_code} = reason} ->
         {:error, reason}
@@ -57,11 +69,9 @@ defmodule F1Dashboard.External.Openf1 do
   end
 
   defp build_url(path) do
-    base_url = Application.get_env(:f1_dashboard, __MODULE__)[:base_url]
-
-    if !base_url do
-      Logger.warning("No base url for openf1 API set, did you configure the env variables?")
-    end
+    base_url =
+      Application.get_env(:f1_dashboard, __MODULE__)[:base_url]
+      |> String.replace_suffix("/", "")
 
     "#{base_url}/v1/#{path}"
   end

@@ -13,6 +13,9 @@ defmodule F1Dashboard.LiveData.Provider.Transformer do
   def sort_by_date({:ok, data}), do: {:ok, do_sort_by_date(data)}
   def sort_by_date(error), do: error
 
+  def get_last({:ok, data}), do: {:ok, Enum.at(data, length(data) - 1)}
+  def get_last(error), do: error
+
   def sort_by_position({:ok, data}), do: {:ok, do_sort_by_position(data)}
   def sort_by_position(error), do: error
 

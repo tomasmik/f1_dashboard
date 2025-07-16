@@ -1,6 +1,8 @@
 defmodule F1DashboardWeb.Components.RaceControl do
   use Phoenix.Component
 
+  attr :race_control, :map, required: true
+
   def render(assigns) do
     ~H"""
     <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">

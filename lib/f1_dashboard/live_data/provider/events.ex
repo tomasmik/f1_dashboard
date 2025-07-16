@@ -6,14 +6,15 @@ defmodule F1Dashboard.LiveData.Provider.Events do
   alias LiveData.Session
 
   @timeout :timer.seconds(10)
-  @required_keys ~w(intervals position stints race_control pit)a
+  @required_keys ~w(intervals position stints race_control pit weather)a
 
   @fetchers %{
     intervals: &Caller.intervals/1,
     position: &Caller.position/1,
     stints: &Caller.stints/1,
     race_control: &Caller.race_control/1,
-    pit: &Caller.pit/1
+    pit: &Caller.pit/1,
+    weather: &Caller.weather/1
   }
 
   @spec for_session(Session.t()) :: {:ok, map()} | {:error, any()}
@@ -61,7 +62,8 @@ defmodule F1Dashboard.LiveData.Provider.Events do
          position: position,
          stints: stints,
          race_control: race_control,
-         pit: pit
+         pit: pit,
+         weather: weather
        }) do
     events = %{
       interval: intervals,
@@ -74,7 +76,7 @@ defmodule F1Dashboard.LiveData.Provider.Events do
     %{
       driver_events: get_drivers_and_group(events),
       race_control: race_control,
-      weather: seed_weather_data()
+      weather: weather
     }
   end
 
@@ -101,16 +103,5 @@ defmodule F1Dashboard.LiveData.Provider.Events do
     events
     |> Enum.filter(&(&1["driver_number"] == driver_number))
     |> List.last()
-  end
-
-  defp seed_weather_data() do
-    %{
-      air_temperature: 325,
-      track_temperature: 37.1,
-      humidity: 99,
-      wind_speed: 2.4,
-      wind_direction: 57,
-      rainfall: 0
-    }
   end
 end

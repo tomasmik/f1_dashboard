@@ -1,6 +1,8 @@
 defmodule F1DashboardWeb.Components.RaceHeader do
   use Phoenix.Component
 
+  attr :session, :map, required: true
+
   def render(assigns) do
     ~H"""
     <div class="bg-gradient-to-r from-red-800 via-red-700 to-red-800 border-b-4 border-red-500">

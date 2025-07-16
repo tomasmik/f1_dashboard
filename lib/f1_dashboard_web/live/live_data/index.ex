@@ -23,17 +23,15 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
   end
 
   def handle_info(:load_data, socket) do
-    session_data = LiveData.get_session()
-    events = LiveData.get_events()
-    {:noreply, socket_assign_init(socket, session_data, events)}
+    {:noreply, socket_assign(socket, LiveData.get_session(), LiveData.get_events())}
   end
 
   def handle_info({:events_updated, events}, socket) do
-    {:noreply, socket_assign_events(socket, events)}
+    {:noreply, socket_assign(socket, events)}
   end
 
   def handle_info({:session_updated, session}, socket) do
-    {:noreply, socket_assign_session(socket, session)}
+    {:noreply, socket_assign(socket, session)}
   end
 
   def render(assigns) do
@@ -59,7 +57,7 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     """
   end
 
-  defp socket_assign_init(socket, nil, _) do
+  defp socket_assign(socket, nil, _) do
     socket
     |> assign(loading: true)
     |> assign(session: nil)
@@ -69,20 +67,20 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     |> assign(drivers: nil)
   end
 
-  defp socket_assign_init(socket, session_data, events) do
+  defp socket_assign(socket, %SessionData{} = session_data, %SessionEvents{} = events) do
     socket
-    |> socket_assign_session(session_data)
-    |> socket_assign_events(events)
+    |> socket_assign(session_data)
+    |> socket_assign(events)
   end
 
-  defp socket_assign_events(socket, %SessionEvents{} = events) do
+  defp socket_assign(socket, %SessionEvents{} = events) do
     socket
     |> assign(weather: events.weather)
     |> assign(race_control: events.race_control)
     |> assign(driver_events: events.driver_events)
   end
 
-  defp socket_assign_session(socket, %SessionData{} = session_data) do
+  defp socket_assign(socket, %SessionData{} = session_data) do
     socket
     |> assign(loading: false)
     |> assign(session: session_data.session)
