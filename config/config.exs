@@ -7,6 +7,8 @@
 # General application configuration
 import Config
 
+config :tesla, Tesla.Middleware.Logger, debug: false
+
 config :f1_dashboard,
   generators: [timestamp_type: :utc_datetime]
 

@@ -8,6 +8,7 @@ defmodule F1Dashboard.Application do
       F1DashboardWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:f1_dashboard, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: F1Dashboard.PubSub},
+      {Finch, name: MyFinch},
       F1DashboardWeb.Endpoint,
       F1Dashboard.LiveData.Cache.Storage,
       F1Dashboard.LiveData.Cache.Worker
