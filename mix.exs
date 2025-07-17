@@ -9,7 +9,14 @@ defmodule F1Dashboard.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [
+        f1_dashboard: [
+          applications: [
+            f1_dashboard: :permanent
+          ]
+        ]
+      ]
     ]
   end
 

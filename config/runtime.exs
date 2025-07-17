@@ -16,9 +16,7 @@ import Config
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
-if System.get_env("PHX_SERVER") do
-  config :f1_dashboard, F1DashboardWeb.Endpoint, server: true
-end
+config :f1_dashboard, F1DashboardWeb.Endpoint, server: true
 
 f1_api_base_url =
   System.get_env("OPEN_F1_BASE_URL") ||
@@ -40,7 +38,8 @@ if config_env() == :prod do
     System.get_env("SECRET_KEY_BASE") ||
       raise """
       environment variable SECRET_KEY_BASE is missing.
-      You can generate one by calling: mix phx.gen.secret
+      It's a base64 encoded string used for secret encryption.
+      You can generate one by calling: "$ openssl rand -hex 32"
       """
 
   host = System.get_env("PHX_HOST") || "example.com"
@@ -49,7 +48,7 @@ if config_env() == :prod do
   config :f1_dashboard, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :f1_dashboard, F1DashboardWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
+    url: [host: host, port: port],
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
