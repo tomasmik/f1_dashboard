@@ -21,8 +21,8 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     ])
   end
 
-  @spec get_session() :: cache_result(session())
-  def get_session() do
+  @spec get_session_data() :: cache_result(session())
+  def get_session_data() do
     case :ets.lookup(@table_name, :session) do
       [{:session, session}] -> {:ok, session}
       [] -> {:error, :not_found}
@@ -37,7 +37,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end
   end
 
-  def store_session(session) do
+  def store_session_data(session) do
     case status = insert_if_changed(:session, session) do
       :updated ->
         :ets.delete(@table_name, :events)
@@ -53,7 +53,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
   end
 
   def store_all_events(fun) do
-    with {:ok, session} <- get_session(),
+    with {:ok, session} <- get_session_data(),
          {:ok, events} <- fun.(session),
          status <- insert_if_changed(:events, events) do
       case status do

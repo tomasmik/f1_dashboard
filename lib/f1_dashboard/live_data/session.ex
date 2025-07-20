@@ -48,4 +48,22 @@ defmodule F1Dashboard.LiveData.Session do
       :meeting_key
     ])
   end
+
+  def status(%__MODULE__{} = session) do
+    now = NaiveDateTime.utc_now()
+
+    cond do
+      NaiveDateTime.compare(now, session.date_start) == :lt -> :upcoming
+      NaiveDateTime.compare(now, session.date_end) == :gt -> :completed
+      true -> :live
+    end
+  end
+
+  def status_display(%__MODULE__{} = session) do
+    case status(session) do
+      :upcoming -> "upcoming"
+      :live -> "live"
+      :completed -> "completed"
+    end
+  end
 end

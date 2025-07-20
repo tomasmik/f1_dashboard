@@ -1,6 +1,8 @@
 defmodule F1DashboardWeb.Components.RaceHeader do
   use Phoenix.Component
 
+  alias F1Dashboard.LiveData.Session
+
   attr :session, :map, required: true
 
   def render(assigns) do
@@ -31,8 +33,7 @@ defmodule F1DashboardWeb.Components.RaceHeader do
   end
 
   defp session_status(assigns) do
-    status = get_session_status(assigns.session)
-    assigns = assign(assigns, :status, status)
+    assigns = assign(assigns, :status, Session.status_display(assigns.session))
 
     ~H"""
     <div class="flex flex-col items-end space-y-2">
@@ -55,16 +56,6 @@ defmodule F1DashboardWeb.Components.RaceHeader do
       </p>
     </div>
     """
-  end
-
-  defp get_session_status(session) do
-    now = NaiveDateTime.utc_now()
-
-    cond do
-      NaiveDateTime.compare(now, session.date_start) == :lt -> "upcoming"
-      NaiveDateTime.compare(now, session.date_end) == :gt -> "completed"
-      true -> "live"
-    end
   end
 
   defp format_datetime(datetime) do

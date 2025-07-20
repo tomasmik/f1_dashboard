@@ -13,9 +13,9 @@ defmodule F1Dashboard.LiveData do
 
   @type storage_result(t) :: {:ok, t} | {:error, :not_found}
 
-  @spec get_session :: SessionData.t() | nil
-  def get_session() do
-    Storage.get_session()
+  @spec get_session_data :: SessionData.t() | nil
+  def get_session_data() do
+    Storage.get_session_data()
     |> result_or_default(nil)
   end
 

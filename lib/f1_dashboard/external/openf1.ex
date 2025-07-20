@@ -27,7 +27,7 @@ defmodule F1Dashboard.External.Openf1 do
          max_retries: @retry_times,
          max_delay: @retry_max_delay_ms,
          should_retry: fn
-           {:ok, %{status: status}}, _env, _context when status in [400, 500] -> true
+           {:ok, %{status: status}}, _env, _context when status in [500, 503, 504] -> true
            {:ok, _reason}, _env, _context -> false
            {:error, _reason}, _env, _context -> true
          end}

@@ -1,4 +1,4 @@
-defmodule F1Dashboard.Fictures do
+defmodule F1Dashboard.Fixtures do
   def drivers() do
     read_ficture("./json/drivers.json")
   end
@@ -23,7 +23,7 @@ defmodule F1Dashboard.Fictures do
     read_ficture("./json/stints.json")
   end
 
-  defp read_ficture(file_name) do
+  defp read_fixture(file_name) do
     Path.expand(file_name, __DIR__)
     |> File.read!()
     |> Jason.decode!()

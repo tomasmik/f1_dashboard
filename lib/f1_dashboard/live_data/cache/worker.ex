@@ -3,9 +3,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   use GenServer
 
-  alias F1Dashboard.LiveData.Cache.{Scheduler, Storage, WorkerState}
-
-  alias F1Dashboard.LiveData.Provider
+  alias F1Dashboard.LiveData.Cache.{Scheduler, Updater}
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -20,7 +18,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
   def handle_continue(:load_state, _state) do
     Logger.info("Loading intial data in the worker")
 
-    new_state = load_state()
+    new_state = Updater.load_initial_state()
     Scheduler.schedule_session_check(self(), new_state)
     Scheduler.schedule_race_check(self(), new_state)
 
@@ -29,7 +27,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   @impl true
   def handle_info(:check_session, state) do
-    new_state = update_session(state)
+    new_state = Updater.maybe_load_session(state)
     Scheduler.schedule_session_check(self(), new_state)
     {:noreply, new_state}
   end
@@ -42,53 +40,8 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   @impl true
   def handle_info(:check_events, state) do
-    new_state = update_events(state)
+    new_state = Updater.load_events(state)
     Scheduler.schedule_race_check(self(), new_state)
     {:noreply, new_state}
-  end
-
-  defp load_state() do
-    with {:ok, session_data} <- Provider.session_data(),
-         {:ok, _} <- Storage.store_session(session_data),
-         {:ok, _} <- store_events() do
-      Logger.info("Loaded initial state")
-      WorkerState.default()
-    else
-      {:error, reason} ->
-        Logger.error("Got an error while loading state #{inspect(reason)}")
-        WorkerState.init()
-    end
-  end
-
-  defp update_session(state) do
-    with {:ok, session_data} <- Provider.session_data(),
-         {:ok, status} <- Storage.store_session(session_data) do
-      WorkerState.update_session_change(state, status)
-    else
-      {:error, reason} ->
-        Logger.error("Got an error while updating session #{inspect(reason)}, resetting state")
-        WorkerState.init()
-    end
-  end
-
-  defp update_events(state) do
-    with {:ok, status} <- store_events() do
-      WorkerState.update_events_change(state, status)
-    else
-      {:error, reason} ->
-        Logger.error("Got an error while updating events #{inspect(reason)}")
-        state
-    end
-  end
-
-  defp store_events() do
-    Logger.info("Loading race events data")
-
-    Storage.store_events(fn session_data ->
-      case Provider.session_events(session_data.session) do
-        {:ok, status} -> {:ok, status}
-        error -> error
-      end
-    end)
   end
 end

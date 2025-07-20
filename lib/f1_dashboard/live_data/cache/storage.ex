@@ -11,7 +11,7 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
   @type events :: SessionEvents.t()
   @type session_data :: SessionData.t()
 
-  defdelegate get_session, to: ETS
+  defdelegate get_session_data, to: ETS
   defdelegate get_events, to: ETS
 
   @spec store_events(function()) :: {:ok, atom()} | {:error, any()}
@@ -19,8 +19,8 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
     GenServer.call(__MODULE__, {:put_events, fun})
   end
 
-  @spec store_session(session_data()) :: {:ok, atom()} | {:error, any()}
-  def store_session(data) do
+  @spec store_session_data(session_data()) :: {:ok, atom()} | {:error, any()}
+  def store_session_data(data) do
     GenServer.call(__MODULE__, {:put_session_data, data})
   end
 
@@ -40,7 +40,7 @@ defmodule F1Dashboard.LiveData.Cache.Storage do
 
   @impl true
   def handle_call({:put_session_data, data}, _from, state) do
-    {:reply, ETS.store_session(data), state}
+    {:reply, ETS.store_session_data(data), state}
   end
 
   @impl true

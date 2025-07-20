@@ -52,6 +52,7 @@ defmodule F1Dashboard.LiveData.Provider.Events do
       end
     end)
     |> case do
+      {:ok, {:error, reason}} -> {:error, reason}
       {:error, _} = error -> error
       acc when is_map(acc) -> {:ok, acc}
     end
