@@ -61,7 +61,7 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     socket
     |> assign(loading: true)
     |> assign(session: nil)
-    |> assign(weather: [])
+    |> assign(weather: nil)
     |> assign(race_control: [])
     |> assign(driver_events: [])
     |> assign(drivers: [])

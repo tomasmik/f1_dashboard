@@ -6,7 +6,7 @@ defmodule F1DashboardWeb.Components.Timing do
 
   def render(assigns) do
     ~H"""
-    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+    <div class="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg border border-gray-700/50 overflow-hidden shadow-lg">
       <div class="bg-gray-750 px-6 py-4 border-b border-gray-700">
         <h2 class="text-xl font-bold text-white flex items-center">
           <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
