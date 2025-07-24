@@ -1,20 +1,21 @@
-defmodule F1Dashboard.LiveData.Cache.Updater do
+defmodule F1Dashboard.LiveData.Workers.Race.DataLoader do
   require Logger
 
   alias F1Dashboard.LiveData.Session
-  alias F1Dashboard.LiveData.Cache.{WorkerState, Storage}
   alias F1Dashboard.LiveData.Provider
+  alias F1Dashboard.LiveData.Cache
+  alias F1Dashboard.LiveData.Workers.Race.State
 
   def load_initial_state do
     with {:ok, session_data} <- Provider.session_data(),
-         {:ok, _} <- Storage.store_session_data(session_data),
+         {:ok, _} <- Cache.store_session_data(session_data),
          {:ok, _} <- store_events() do
       Logger.info("Loaded initial state")
-      WorkerState.default()
+      State.default()
     else
       {:error, reason} ->
         Logger.error("Got an error while loading state #{inspect(reason)}")
-        WorkerState.init()
+        State.init()
     end
   end
 
@@ -31,7 +32,7 @@ defmodule F1Dashboard.LiveData.Cache.Updater do
 
   def load_events(state) do
     with {:ok, status} <- store_events() do
-      WorkerState.update_events_change(state, status)
+      State.update_events_change(state, status)
     else
       {:error, reason} ->
         Logger.error("Got an error while updating events #{inspect(reason)}")
@@ -41,19 +42,19 @@ defmodule F1Dashboard.LiveData.Cache.Updater do
 
   defp load_session(state) do
     with {:ok, session_data} <- Provider.session_data(),
-         {:ok, status} <- Storage.store_session_data(session_data) do
-      WorkerState.update_session_change(state, status)
+         {:ok, status} <- Cache.store_session_data(session_data) do
+      State.update_session_change(state, status)
     else
       {:error, reason} ->
         Logger.error("Got an error while updating session #{inspect(reason)}, resetting state")
-        WorkerState.init()
+        State.init()
     end
   end
 
   defp store_events() do
     Logger.info("Loading race events data")
 
-    Storage.store_events(fn session_data ->
+    Cache.store_events(fn session_data ->
       case Provider.session_events(session_data.session) do
         {:ok, status} -> {:ok, status}
         error -> error
@@ -62,7 +63,7 @@ defmodule F1Dashboard.LiveData.Cache.Updater do
   end
 
   defp refresh_session?() do
-    case Storage.get_session_data() do
+    case Cache.get_session_data() do
       {:ok, session_data} ->
         Session.status(session_data.session) in [:completed]
 

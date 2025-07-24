@@ -10,7 +10,7 @@ defmodule F1Dashboard.Application do
       {Phoenix.PubSub, name: F1Dashboard.PubSub},
       {Finch, name: MyFinch},
       F1DashboardWeb.Endpoint,
-      F1Dashboard.LiveData.Cache.Supervisor
+      F1Dashboard.LiveData.Supervisor
     ]
 
     opts = [strategy: :one_for_one, name: F1Dashboard.Supervisor]

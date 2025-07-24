@@ -1,7 +1,7 @@
-defmodule F1Dashboard.LiveData.Cache.Scheduler do
+defmodule F1Dashboard.LiveData.Workers.Race.Scheduler do
   require Logger
 
-  alias F1Dashboard.LiveData.Cache.WorkerState
+  alias F1Dashboard.LiveData.Workers.Race.State
 
   def schedule_after(_pid, _event, nil), do: :ok
 
@@ -11,11 +11,11 @@ defmodule F1Dashboard.LiveData.Cache.Scheduler do
     :ok
   end
 
-  def schedule_session_check(target_pid, %WorkerState{session_every: interval}) do
+  def schedule_session_check(target_pid, %State{session_every: interval}) do
     schedule_after(target_pid, :check_session, interval)
   end
 
-  def schedule_race_check(target_pid, %WorkerState{events_every: interval}) do
+  def schedule_race_check(target_pid, %State{events_every: interval}) do
     schedule_after(target_pid, :check_events, interval)
   end
 end

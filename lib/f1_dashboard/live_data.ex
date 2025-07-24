@@ -8,20 +8,20 @@ defmodule F1Dashboard.LiveData do
   alias Phoenix.PubSub
 
   alias F1Dashboard.Topics
-  alias F1Dashboard.LiveData.Cache.Storage
+  alias F1Dashboard.LiveData.Cache
   alias F1Dashboard.LiveData.{SessionData, SessionEvents}
 
   @type storage_result(t) :: {:ok, t} | {:error, :not_found}
 
   @spec get_session_data :: SessionData.t() | nil
   def get_session_data() do
-    Storage.get_session_data()
+    Cache.get_session_data()
     |> result_or_default(nil)
   end
 
   @spec get_events :: SessionEvents.t()
   def get_events() do
-    Storage.get_events()
+    Cache.get_events()
     |> result_or_default(%SessionEvents{})
   end
 

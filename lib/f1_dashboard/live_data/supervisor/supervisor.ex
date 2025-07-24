@@ -1,7 +1,7 @@
-defmodule F1Dashboard.LiveData.Cache.Supervisor do
+defmodule F1Dashboard.LiveData.Supervisor do
   use Supervisor
 
-  alias F1Dashboard.LiveData.Cache
+  alias F1Dashboard.LiveData
 
   def start_link(arg) do
     Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
@@ -10,8 +10,8 @@ defmodule F1Dashboard.LiveData.Cache.Supervisor do
   @impl true
   def init(_arg) do
     children = [
-      Cache.Storage,
-      Cache.Worker
+      LiveData.Cache,
+      LiveData.Workers.Race
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

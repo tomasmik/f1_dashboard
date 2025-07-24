@@ -1,4 +1,6 @@
 defmodule F1Dashboard.LiveData.Cache.ETS do
+  @behaviour F1Dashboard.LiveData.Cache.Storage
+
   require Logger
 
   @table_name :f1_data
@@ -12,6 +14,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
   @type events :: SessionEvents.t()
   @type session :: SessionData.t()
 
+  @impl true
   def init() do
     :ets.new(@table_name, [
       :set,
@@ -21,7 +24,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     ])
   end
 
-  @spec get_session_data() :: cache_result(session())
+  @impl true
   def get_session_data() do
     case :ets.lookup(@table_name, :session) do
       [{:session, session}] -> {:ok, session}
@@ -29,7 +32,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end
   end
 
-  @spec get_events() :: cache_result(events())
+  @impl true
   def get_events() do
     case :ets.lookup(@table_name, :events) do
       [{:events, events}] -> {:ok, events}
@@ -37,6 +40,7 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end
   end
 
+  @impl true
   def store_session_data(session) do
     case status = insert_if_changed(:session, session) do
       :updated ->
@@ -52,7 +56,8 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end
   end
 
-  def store_all_events(fun) do
+  @impl true
+  def store_all_events(fun) when is_function(fun, 1) do
     with {:ok, session} <- get_session_data(),
          {:ok, events} <- fun.(session),
          status <- insert_if_changed(:events, events) do
@@ -72,7 +77,8 @@ defmodule F1Dashboard.LiveData.Cache.ETS do
     end
   end
 
-  def clear_table() do
+  @impl true
+  def clear() do
     Logger.info("Cleaning up the cache, will remove all data")
     :ets.delete_all_objects(@table_name)
   end

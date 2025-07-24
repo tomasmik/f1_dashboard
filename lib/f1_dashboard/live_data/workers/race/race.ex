@@ -1,9 +1,9 @@
-defmodule F1Dashboard.LiveData.Cache.Worker do
+defmodule F1Dashboard.LiveData.Workers.Race do
   require Logger
 
   use GenServer
 
-  alias F1Dashboard.LiveData.Cache.{Scheduler, Updater}
+  alias F1Dashboard.LiveData.Workers.Race.{Scheduler, DataLoader}
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -18,7 +18,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
   def handle_continue(:load_state, _state) do
     Logger.info("Loading intial data in the worker")
 
-    new_state = Updater.load_initial_state()
+    new_state = DataLoader.load_initial_state()
     Scheduler.schedule_session_check(self(), new_state)
     Scheduler.schedule_race_check(self(), new_state)
 
@@ -27,7 +27,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   @impl true
   def handle_info(:check_session, state) do
-    new_state = Updater.maybe_load_session(state)
+    new_state = DataLoader.maybe_load_session(state)
     Scheduler.schedule_session_check(self(), new_state)
     {:noreply, new_state}
   end
@@ -40,7 +40,7 @@ defmodule F1Dashboard.LiveData.Cache.Worker do
 
   @impl true
   def handle_info(:check_events, state) do
-    new_state = Updater.load_events(state)
+    new_state = DataLoader.load_events(state)
     Scheduler.schedule_race_check(self(), new_state)
     {:noreply, new_state}
   end
