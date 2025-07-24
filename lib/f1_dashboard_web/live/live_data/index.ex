@@ -61,10 +61,10 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     socket
     |> assign(loading: true)
     |> assign(session: nil)
-    |> assign(weather: nil)
-    |> assign(race_control: nil)
-    |> assign(driver_events: nil)
-    |> assign(drivers: nil)
+    |> assign(weather: [])
+    |> assign(race_control: [])
+    |> assign(driver_events: [])
+    |> assign(drivers: [])
   end
 
   defp socket_assign(socket, %SessionData{} = session_data, %SessionEvents{} = events) do

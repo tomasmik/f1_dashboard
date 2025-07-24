@@ -33,13 +33,10 @@ defmodule F1DashboardWeb.Components.Timing do
                 GAP
               </th>
               <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
-                INT
-              </th>
-              <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
                 TYRE
               </th>
-              <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
-                PIT
+              <th class="px-2 py-2 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
+                LAST PIT
               </th>
             </tr>
           </thead>
@@ -89,10 +86,7 @@ defmodule F1DashboardWeb.Components.Timing do
         </div>
       </td>
       <td class="px-4 py-4 whitespace-nowrap">
-        <.gap_display events={@events} position={@position} />
-      </td>
-      <td class="px-4 py-4 whitespace-nowrap">
-        <.interval_display events={@events} />
+        <.timing_display events={@events} position={@position} />
       </td>
       <td class="px-4 py-4 whitespace-nowrap">
         <.tyre_display events={@events} />
@@ -104,30 +98,28 @@ defmodule F1DashboardWeb.Components.Timing do
     """
   end
 
-  defp gap_display(assigns) do
+  defp timing_display(assigns) do
     ~H"""
-    <div class="text-sm font-mono">
-      <%= if @position == 1 do %>
-        <span class="text-green-400 font-bold">LEADER</span>
-      <% else %>
-        <%= if @events.interval && @events.interval.gap_to_leader do %>
-          <span class="text-white font-bold">+{@events.interval.gap_to_leader}</span>
+    <div class="text-sm font-mono space-y-1">
+      <div class="leading-tight">
+        <%= if @events.interval && @events.interval.interval do %>
+          <span class="text-white font-bold text-base">+{@events.interval.interval}</span>
         <% else %>
-          <span class="text-blue-400 font-bold">+1 LAP</span>
+          <span class="text-gray-500 font-bold text-base">--</span>
         <% end %>
-      <% end %>
-    </div>
-    """
-  end
+      </div>
 
-  defp interval_display(assigns) do
-    ~H"""
-    <div class="text-sm font-mono">
-      <%= if @events.interval && @events.interval.interval do %>
-        <span class="text-gray-300">+{@events.interval.interval}</span>
-      <% else %>
-        <span class="text-gray-500">--</span>
-      <% end %>
+      <div class="leading-tight">
+        <%= if @position == 1 do %>
+          <span class="text-green-400 text-xs font-medium">LEADER</span>
+        <% else %>
+          <%= if @events.interval && @events.interval.gap_to_leader do %>
+            <span class="text-gray-400 text-xs">+{@events.interval.gap_to_leader}</span>
+          <% else %>
+            <span class="text-blue-400 text-xs">+1 LAP</span>
+          <% end %>
+        <% end %>
+      </div>
     </div>
     """
   end
@@ -182,9 +174,7 @@ defmodule F1DashboardWeb.Components.Timing do
     ~H"""
     <%= if @events.pit do %>
       <div class="flex items-center space-x-2">
-        <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-        <div class="text-xs">
-          <div class="text-white font-bold">PIT</div>
+        <div class="text-s">
           <div class="text-gray-400">{@events.pit.pit_duration}s</div>
         </div>
       </div>
