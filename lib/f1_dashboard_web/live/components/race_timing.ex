@@ -1,5 +1,7 @@
-defmodule F1DashboardWeb.Components.Timing do
+defmodule F1DashboardWeb.Components.RaceTiming do
   use Phoenix.Component
+
+  alias F1DashboardWeb.Components.Tire
 
   attr :driver_events, :list, required: true
   attr :drivers, :map, required: true
@@ -33,7 +35,7 @@ defmodule F1DashboardWeb.Components.Timing do
                 GAP
               </th>
               <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
-                TYRE
+                TIRE
               </th>
               <th class="px-2 py-2 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
                 LAST PIT
@@ -89,7 +91,7 @@ defmodule F1DashboardWeb.Components.Timing do
         <.timing_display events={@events} position={@position} />
       </td>
       <td class="px-4 py-4 whitespace-nowrap">
-        <.tyre_display events={@events} />
+        <Tire.render events={@events} />
       </td>
       <td class="px-4 py-4 whitespace-nowrap">
         <.pit_display events={@events} />
@@ -120,52 +122,6 @@ defmodule F1DashboardWeb.Components.Timing do
           <% end %>
         <% end %>
       </div>
-    </div>
-    """
-  end
-
-  defp tyre_display(assigns) do
-    ~H"""
-    <%= if @events.stint do %>
-      <div class="flex items-center space-x-2">
-        <.tyre_compound compound={@events.stint.compound} />
-        <div class="text-xs">
-          <div class="text-white font-bold">
-            {String.first(@events.stint.compound || "U")}
-          </div>
-          <div class="text-gray-400">
-            {@events.stint.tire_age_at_start}
-          </div>
-        </div>
-      </div>
-    <% else %>
-      <span class="text-gray-500">--</span>
-    <% end %>
-    """
-  end
-
-  defp tyre_compound(assigns) do
-    ~H"""
-    <div class={[
-      "w-6 h-6 rounded-full border-2 flex items-center justify-center",
-      case @compound do
-        "SOFT" -> "bg-red-500 border-red-400"
-        "MEDIUM" -> "bg-yellow-500 border-yellow-400"
-        "HARD" -> "bg-white border-gray-300"
-        "INTERMEDIATE" -> "bg-green-500 border-green-400"
-        "WET" -> "bg-blue-500 border-blue-400"
-        _ -> "bg-gray-500 border-gray-400"
-      end
-    ]}>
-      <span class={[
-        "text-xs font-bold",
-        case @compound do
-          "HARD" -> "text-black"
-          _ -> "text-white"
-        end
-      ]}>
-        {String.first(@compound || "U")}
-      </span>
     </div>
     """
   end

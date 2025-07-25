@@ -9,7 +9,8 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     LoadingDashboard,
     RaceControl,
     RaceHeader,
-    Timing,
+    RaceTiming,
+    OtherTiming,
     Weather
   }
 
@@ -50,7 +51,11 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
             </div>
           </div>
 
-          <Timing.render driver_events={@driver_events} drivers={@drivers} />
+          <%= if @is_race do %>
+            <RaceTiming.render driver_events={@driver_events} drivers={@drivers} />
+          <% else %>
+            <OtherTiming.render driver_events={@driver_events} drivers={@drivers} />
+          <% end %>
         </div>
       </div>
     <% end %>
@@ -83,6 +88,7 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
   defp socket_assign_session(socket, session_data) do
     socket
     |> assign(loading: false)
+    |> assign(is_race: String.upcase(session_data.session.session_type) == "RACE")
     |> assign(session: session_data.session)
     |> assign(drivers: SessionData.drivers_by_number(session_data))
   end
