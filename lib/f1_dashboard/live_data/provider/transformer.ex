@@ -33,7 +33,7 @@ defmodule F1Dashboard.LiveData.Provider.Transformer do
   end
 
   defp do_filter_outdated_events(events) do
-    newest = Enum.max_by(events, &must_parse_date(&1), NaiveDateTime)
+    newest = Enum.max_by(events, &must_parse_date(&1), NaiveDateTime, fn -> %{} end)
 
     events
     |> Enum.filter(&older_than_max(newest, &1))
