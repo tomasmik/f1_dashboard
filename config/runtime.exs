@@ -26,6 +26,8 @@ f1_api_base_url =
     However live features will NOT WORK.
     """
 
+config :f1_dashboard, F1DashboardWeb.Endpoint, check_origin: false
+
 config :f1_dashboard, F1Dashboard.External.Openf1, base_url: f1_api_base_url
 
 if config_env() == :prod do

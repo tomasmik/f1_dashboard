@@ -2,18 +2,26 @@ defmodule F1DashboardWeb.Components.Weather do
   use Phoenix.Component
 
   attr :weather, :map, required: true
+  attr :collapsed, :boolean, required: true
+  attr :section_name, :string, default: "weather"
 
   def render(assigns) do
-    ~H"""
-    <div class="bg-gradient-to-br from-gray-800 to-gray-850 rounded-xl border border-gray-700/50 overflow-hidden shadow-lg">
-      <.section_header />
+    assigns = assign_new(assigns, :collapsed, fn -> false end)
 
-      <div class="p-6">
-        <%= if @weather do %>
-          <.weather_grid weather={@weather} />
-        <% else %>
-          <.no_data_state />
-        <% end %>
+    ~H"""
+    <div class="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg border border-gray-700/50 overflow-hidden shadow-lg">
+      <.section_header collapsed={@collapsed} section_name={@section_name || "weather"} />
+      <div class={[
+        "transition-all duration-300 ease-in-out overflow-hidden",
+        if(@collapsed, do: "max-h-0 opacity-0", else: "max-h-[1000px] opacity-100")
+      ]}>
+        <div class="p-6">
+          <%= if @weather do %>
+            <.weather_grid weather={@weather} />
+          <% else %>
+            <.no_data_state />
+          <% end %>
+        </div>
       </div>
     </div>
     """
@@ -21,10 +29,28 @@ defmodule F1DashboardWeb.Components.Weather do
 
   defp section_header(assigns) do
     ~H"""
-    <div class="bg-gray-750 px-6 py-4 border-b border-gray-700">
+    <div class="bg-gray-750 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
       <h2 class="text-xl font-bold text-white flex items-center">
         <.track_icon /> TRACK CONDITIONS
       </h2>
+      <button
+        phx-click="toggle_section"
+        phx-value-section={@section_name}
+        type="button"
+        class="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-700/50"
+      >
+        <svg
+          class={[
+            "w-5 h-5 transition-transform duration-200",
+            if(@collapsed, do: "rotate-0", else: "rotate-180")
+          ]}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
     </div>
     """
   end

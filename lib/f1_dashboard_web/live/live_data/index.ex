@@ -20,6 +20,7 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
       LiveData.subscribe()
     end
 
+    socket = assign(socket, :collapsed_sections, %{})
     {:ok, assign(socket, :loading, true)}
   end
 
@@ -35,6 +36,13 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     {:noreply, socket_assign_session(socket, session)}
   end
 
+  def handle_event("toggle_section", %{"section" => section}, socket) do
+    collapsed_sections = socket.assigns.collapsed_sections
+    new_collapsed_sections = Map.update(collapsed_sections, section, true, &(!&1))
+
+    {:noreply, assign(socket, :collapsed_sections, new_collapsed_sections)}
+  end
+
   def render(assigns) do
     ~H"""
     <%= if @loading do %>
@@ -45,9 +53,17 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
 
         <div class="px-4 py-6 space-y-6">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Weather.render weather={@weather} />
+            <Weather.render
+              weather={@weather}
+              collapsed={section_collapsed?(@collapsed_sections, "weather")}
+              section_name="weather"
+            />
             <div class="lg:col-span-2">
-              <RaceControl.render race_control={@race_control} />
+              <RaceControl.render
+                race_control={@race_control}
+                collapsed={section_collapsed?(@collapsed_sections, "race_control")}
+                section_name="race_control"
+              />
             </div>
           </div>
 
@@ -91,5 +107,9 @@ defmodule F1DashboardWeb.LiveData.Dashboard do
     |> assign(is_race: String.upcase(session_data.session.session_type) == "RACE")
     |> assign(session: session_data.session)
     |> assign(drivers: SessionData.drivers_by_number(session_data))
+  end
+
+  defp section_collapsed?(collapsed_sections, section_name) do
+    Map.get(collapsed_sections, section_name, false)
   end
 end

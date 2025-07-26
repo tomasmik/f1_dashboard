@@ -25,13 +25,16 @@ defmodule F1DashboardWeb.Components.OtherTiming do
         <table class="w-full">
           <thead class="bg-gray-750">
             <tr class="border-b border-gray-700">
-              <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider w-16">
+              <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider w-12 sm:w-16">
                 POS
               </th>
-              <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
+              <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
                 DRIVER
               </th>
-              <th class="px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
+              <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
+                GAP
+              </th>
+              <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
                 TIRE
               </th>
             </tr>
@@ -55,9 +58,9 @@ defmodule F1DashboardWeb.Components.OtherTiming do
   defp driver_timing_row(assigns) do
     ~H"""
     <tr class="border-b border-gray-700 hover:bg-gray-750 transition-colors">
-      <td class="px-4 py-4 whitespace-nowrap">
+      <td class="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
         <div class={[
-          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
+          "w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold",
           case @position do
             1 -> "bg-yellow-500 text-black"
             2 -> "bg-gray-300 text-black"
@@ -68,12 +71,17 @@ defmodule F1DashboardWeb.Components.OtherTiming do
           {@position}
         </div>
       </td>
-      <td class="px-4 py-4 whitespace-nowrap">
+      <td class="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
         <div class="flex items-center">
           <div class="w-1 h-8 bg-red-600 rounded-full mr-3"></div>
           <div>
             <div class="text-sm font-bold text-white">
-              {Map.get(@drivers, @driver_number).broadcast_name}
+              <span class="sm:hidden">
+                {Map.get(@drivers, @driver_number).name_acronym}
+              </span>
+              <span class="hidden sm:inline">
+                {Map.get(@drivers, @driver_number).broadcast_name}
+              </span>
             </div>
             <div class="text-xs text-gray-400 font-mono">
               #{@driver_number}
@@ -81,7 +89,7 @@ defmodule F1DashboardWeb.Components.OtherTiming do
           </div>
         </div>
       </td>
-      <td class="px-4 py-4 whitespace-nowrap">
+      <td class="px-2 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
         <Tire.render events={@events} />
       </td>
     </tr>

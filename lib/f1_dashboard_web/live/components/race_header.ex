@@ -29,7 +29,7 @@ defmodule F1DashboardWeb.Components.RaceHeader do
   defp session_info(assigns) do
     ~H"""
     <div class="space-y-1">
-      <h1 class="text-3xl font-semibold text-white tracking-tight">
+      <h1 class="text-2xl font-semibold text-white tracking-tight">
         {@session.circuit_short_name}
       </h1>
       <div class="flex items-center space-x-2 text-gray-300">
@@ -51,7 +51,9 @@ defmodule F1DashboardWeb.Components.RaceHeader do
     ~H"""
     <div class="flex flex-col items-end space-y-3">
       <.status_badge status={@status} />
-      <.session_datetime session={@session} />
+      <div class="hidden sm:block">
+        <.session_datetime session={@session} />
+      </div>
     </div>
     """
   end
