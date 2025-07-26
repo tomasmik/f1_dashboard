@@ -32,9 +32,6 @@ defmodule F1DashboardWeb.Components.OtherTiming do
                 DRIVER
               </th>
               <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
-                GAP
-              </th>
-              <th class="px-2 sm:px-4 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">
                 TIRE
               </th>
             </tr>
